@@ -13,15 +13,31 @@ pip install autokit
 ## Basic Usage
 ```python
 import autokit 
+from pathlib import Path
 
-class MyToolManager(autokit.ExternalToolManager):
-    def __init__(self, config_path="my_tools.json"):
-        super().__init__(config_path)  
- 
+class MyToolManager:
+    DOWNLOAD_URLS = {
+        'Windows': "example.com/downloads/windows.zip",
+        'Darwin': "example.com/downloads/osx-x64.zip",
+        'Linux': "example.com/downloads/linux.zip",
+    }
 
-# Get a tool instance and use its methods
-tool = MyToolManager().get_tool("some_tool_name")
-tool.run_command("arg1", "arg2")
+    def __init__(self, base_dir: Path = "./third-party"):
+        self.tool = autokit.ExternalToolManager(
+            tool_name="IRSSMediaTools",
+            download_urls=self.DOWNLOAD_URLS,  # Pass URLs
+            python=False,
+            base_dir=base_dir)
+        self.tool.setup()
+
+
+    
+
+    def run(self):
+        self.tool.run_command("--help")    
+
+example = MyToolManager()
+example.run()
 ```
 
 ## Features
