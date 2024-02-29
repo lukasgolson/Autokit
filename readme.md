@@ -1,4 +1,4 @@
-# autokit version 0.1.0
+# autokit version 0.1.1
 
 
 
@@ -11,9 +11,11 @@ pip install autokit
 ```
 
 ## Basic Usage
+
 ```python
-import autokit 
+import autokit
 from pathlib import Path
+
 
 class MyToolManager:
     DOWNLOAD_URLS = {
@@ -23,18 +25,16 @@ class MyToolManager:
     }
 
     def __init__(self, base_dir: Path = "./third-party"):
-        self.tool = autokit.ExternalToolManager(
-            tool_name="IRSSMediaTools",
+        self.tool = autokit.ExternalTool(
+            tool_name="ExampleTool",
             download_urls=self.DOWNLOAD_URLS,  # Pass URLs
             python=False,
             base_dir=base_dir)
         self.tool.setup()
 
-
-    
-
     def run(self):
-        self.tool.run_command("--help")    
+        self.tool.run_command("--help")
+
 
 example = MyToolManager()
 example.run()
