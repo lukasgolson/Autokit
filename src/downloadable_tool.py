@@ -15,7 +15,7 @@ from loguru import logger
 from tqdm import tqdm
 
 
-class DownloadableTool:
+class ExternalToolManager:
     CHUNK_SIZE = 1024  # define magic constant
 
     def __init__(self, tool_name: str, platform_data: Dict[str, dict], python: bool = False,
@@ -123,15 +123,15 @@ class DownloadableTool:
         else:
             cmd = f'{self.calculate_path().resolve()} {cmd}'
 
-        commandArgs = shlex.split(cmd, posix=False)
+        command_args = shlex.split(cmd, posix=False)
 
-        for i, arg in enumerate(commandArgs):
+        for i, arg in enumerate(command_args):
             if arg.startswith('"') and arg.endswith('"'):
-                commandArgs[i] = arg[1:-1]
+                command_args[i] = arg[1:-1]
 
-        logger.info(f"Running command: {commandArgs}")
+        logger.info(f"Running command: {command_args}")
 
-        with subprocess.Popen(commandArgs, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=1,
+        with subprocess.Popen(command_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=1,
                               universal_newlines=True) as p:
             while True:
                 line = p.stdout.readline()
