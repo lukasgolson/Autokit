@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "autokit"
-version = "0.1.1"
+version = "0.2.0"
 description = "A simple tool to automate the installation and integration of external tools."
 readme = "readme.md"
 authors = [{name = "Lukas G. Olson", email = "olson@student.ubc.ca"}]
@@ -29,7 +29,7 @@ dependencies = [
 Repository = "https://github.com/lukasgolson/Autokit"
 
 [tool.bumpver]
-current_version = "0.1.1"
+current_version = "0.2.0"
 version_pattern = "MAJOR.MINOR.PATCH"
 commit_message = "bump version {old_version} -> {new_version}"
 tag_message = "{new_version}"
