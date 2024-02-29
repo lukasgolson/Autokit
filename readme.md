@@ -1,4 +1,6 @@
-# autokit
+# autokit version 0.1.0
+
+
 
 A framework for effortlessly integrating external tools into your Python projects.
 
@@ -15,9 +17,7 @@ import autokit
 class MyToolManager(autokit.ExternalToolManager):
     def __init__(self, config_path="my_tools.json"):
         super().__init__(config_path)  
-
-# Define tools in your my_tools.json configuration file  
-# ... (See Additional Notes)  
+ 
 
 # Get a tool instance and use its methods
 tool = MyToolManager().get_tool("some_tool_name")
