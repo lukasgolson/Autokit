@@ -10,7 +10,7 @@ version = "0.1.0"
 description = "A simple tool to automate the installation and integration of external tools."
 readme = "readme.md"
 authors = [{name = "Lukas G. Olson", email = "olson@student.ubc.ca"}]
-license = "MIT"
+license = { file = "LICENSE" }
 classifiers = [
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python",
