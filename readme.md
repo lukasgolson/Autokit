@@ -14,30 +14,39 @@ pip install autokit
 
 ```python
 import autokit
-from pathlib import Path
+
+class MyTool(autokit.ExternalTool):
+    @property
+    def tool_name(self):
+        return "MyTool"
+
+    @property
+    def platform_data(self):
+        return {
+            'Windows': {
+                'url': "example.com/downloads/windows.zip",
+                'subdir': "",
+                'extension': ".exe"
+            },
+            'Darwin': {
+                'url': "example.com/downloads/osx-x64.zip",
+                'subdir': "",
+                'extension': ""
+            },
+            'Linux': {
+                'url': "example.com/downloads/linux.zip",
+                'subdir': "",
+                'extension': ""
+            },
+        }
+
+    @property
+    def python(self):
+        return False
 
 
-class MyToolManager:
-    DOWNLOAD_URLS = {
-        'Windows': "example.com/downloads/windows.zip",
-        'Darwin': "example.com/downloads/osx-x64.zip",
-        'Linux': "example.com/downloads/linux.zip",
-    }
-
-    def __init__(self, base_dir: Path = "./third-party"):
-        self.tool = autokit.ExternalTool(
-            tool_name="ExampleTool",
-            download_urls=self.DOWNLOAD_URLS,  # Pass URLs
-            python=False,
-            base_dir=base_dir)
-        self.tool.setup()
-
-    def run(self):
-        self.tool.run_command("--help")
-
-
-example = MyToolManager()
-example.run()
+tool = MyTool(base_dir="./third-party")
+tool.run_command("--help")
 ```
 
 ## Features

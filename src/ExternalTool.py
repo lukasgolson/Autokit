@@ -14,8 +14,12 @@ from downloader import download
 
 
 class ExternalTool(ABC):
-    def __init__(self, base_dir: Path = "./third-party"):
+    def __init__(self, base_dir: Path = "./third-party", lazy_setup: bool = False):
         self.base_dir = Path(base_dir)
+
+        if not lazy_setup:
+            self.setup()
+
 
     @property
     @abstractmethod
@@ -88,6 +92,10 @@ class ExternalTool(ABC):
         Returns:
             The exit code of the subprocess.
         """
+
+        if not self.setup():
+            raise ValueError(f"Could not set up {self.tool_name}")
+
         if self.python:
             cmd = f'{sys.executable} "{self.calculate_path().resolve()}" {cmd}'
         else:
