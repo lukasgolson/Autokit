@@ -19,7 +19,8 @@ def download(tool_directory: Path, url: str, chunk_size=1024, progress_callback=
     total_size_in_bytes = int(response.headers.get('content-length', 0))
     bytes_downloaded = 0
 
-    filename = url.split('/')[-1]
+    # get the filename from the URL by splitting it at the last '/' and removing any query parameters
+    filename = url.split('/')[-1].split('?')[0]
 
     progress_context = type('', (), {})()
 
