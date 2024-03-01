@@ -11,11 +11,12 @@ class ToolConfig(NamedTuple):
     ----------
     tool_name : str
         The name of the tool.
+    python : bool
+        Whether the tool should be executed by the Python interpreter or treated as an executable.
     platform_data : Dict[str, PlatformData]
         The platform data for the tool.
-    python : bool
-        Whether the tool should be executed by the Python interpreter.
     """
     tool_name: str
-    platform_data: Dict[str, PlatformData]
     python: bool
+    platform_data: Dict[str, PlatformData]
+

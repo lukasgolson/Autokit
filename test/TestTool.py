@@ -1,8 +1,6 @@
 from pathlib import Path
 
-from autokit.ExternalTool import ExternalTool
-from autokit.PlatformData import PlatformData
-from autokit.ToolConfig import ToolConfig
+from autokit import ExternalTool, ToolConfig, PlatformData
 
 
 class TestTool(ExternalTool):

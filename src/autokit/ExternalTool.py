@@ -9,10 +9,9 @@ import sys
 from abc import ABC, abstractmethod
 from pathlib import Path
 
-from autokit.PlatformData import PlatformData
-from autokit.ToolConfig import ToolConfig
-from autokit.downloader import download
-from autokit.progressBar import print_progress_bar
+from . import ToolConfig, PlatformData
+from .downloader import download
+from .progressBar import print_progress_bar
 
 
 class ExternalTool(ABC):
