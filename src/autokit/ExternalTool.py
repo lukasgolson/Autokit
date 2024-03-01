@@ -93,7 +93,7 @@ class ExternalTool(ABC):
             raise ValueError(f"Unsupported operating system: {system}")
         return platform_data[system]
 
-    def run_command(self, cmd: str, stdout=None, stdin=None) -> int:
+    def run_command(self, cmd: str, stdout=None, stderr=None, stdin=None) -> int:
         """
         Run a command in a subprocess.
 
@@ -120,9 +120,7 @@ class ExternalTool(ABC):
             if arg.startswith('"') and arg.endswith('"'):
                 command_args[i] = arg[1:-1]
 
-
-
-        with subprocess.Popen(command_args, stdout=stdout, stderr=subprocess.PIPE, stdin=stdin, bufsize=1,
+        with subprocess.Popen(command_args, stdout=stdout, stderr=stderr, stdin=stdin, bufsize=1,
                               universal_newlines=True) as p:
 
             if p.stdout:
