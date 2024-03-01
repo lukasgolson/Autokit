@@ -1,4 +1,4 @@
-# autokit version 0.6.0
+# autokit version 0.7.0
 
 
 
@@ -13,6 +13,9 @@ pip install autokit
 ## Basic Usage
 
 ```python
+from autokit import ToolConfig, PlatformData, ExternalTool
+from pathlib import Path
+
 class TestTool(ExternalTool):
     def __init__(self, base_dir: str = "./third-party", progress_bar: bool = True, lazy_setup: bool = False):
         super().__init__(base_dir, progress_bar, lazy_setup)
