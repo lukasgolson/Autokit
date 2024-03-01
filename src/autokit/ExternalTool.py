@@ -8,10 +8,10 @@ import subprocess
 import sys
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Dict
 
-from downloader import download
-from progressBar import print_progress_bar
+from autokit.Config import ToolConfig, PlatformData
+from autokit.downloader import download
+from autokit.progressBar import print_progress_bar
 
 
 class ExternalTool(ABC):
@@ -23,33 +23,26 @@ class ExternalTool(ABC):
 
     @property
     @abstractmethod
+    def config(self) -> ToolConfig:
+        pass
+
+    @property
     def tool_name(self) -> str:
         """
         Returns the name of the tool.
         """
-        return self.tool_name
+        return self.config.tool_name
 
     @property
-    @abstractmethod
-    def platform_data(self) -> Dict[str, dict]:
-        """
-        Returns the platform data for the tool.
-        """
-        # throw error if not implemented
-        raise NotImplementedError("Platform data not implemented")
+    def python(self) -> bool:
+        return self.config.python
 
     @property
-    @abstractmethod
     def tool_directory(self) -> Path:
         """
         Returns the directory where the tool is installed.
         """
         return Path(self.base_dir) / Path(self.tool_name)
-
-    @property
-    @abstractmethod
-    def python(self) -> bool:
-        return False
 
     def setup(self, use_progress_bar=False) -> bool:
         """
@@ -59,7 +52,11 @@ class ExternalTool(ABC):
             return True
 
         self.tool_directory.mkdir(parents=True, exist_ok=True)
-        url = self.get_platform_data()['url']
+        url = self.get_platform_data().url
+
+        # check if the tool is already downloaded
+        if self.calculate_path().exists():
+            return True
 
         if use_progress_bar:
             download(self.tool_directory, url, progress_callback=print_progress_bar)
@@ -76,12 +73,20 @@ class ExternalTool(ABC):
 
         return True
 
-    def get_platform_data(self) -> dict:
+    def get_platform_data(self) -> PlatformData:
         """Retrieves platform-specific data from the dictionary."""
         system = platform.system()
-        if system not in self.platform_data:
+
+        platform_data = self.config.platform_data
+
+        for key in platform_data:
+            if key.lower() == system.lower():
+                system = key
+                break
+
+        if system not in platform_data:
             raise ValueError(f"Unsupported operating system: {system}")
-        return self.platform_data[system]
+        return platform_data[system]
 
     def run_command(self, cmd: str, stdout=None, stdin=None) -> int:
         """
@@ -110,12 +115,16 @@ class ExternalTool(ABC):
             if arg.startswith('"') and arg.endswith('"'):
                 command_args[i] = arg[1:-1]
 
+
+
         with subprocess.Popen(command_args, stdout=stdout, stderr=subprocess.PIPE, stdin=stdin, bufsize=1,
                               universal_newlines=True) as p:
-            while True:
-                line = p.stdout.readline()
-                if not line:
-                    break
+
+            if p.stdout:
+                while True:
+                    line = p.stdout.readline()
+                    if not line:
+                        break
 
             exit_code = p.wait()
         return exit_code
@@ -126,16 +135,14 @@ class ExternalTool(ABC):
         """
         directory = self.calculate_dir()
         platform_data = self.get_platform_data()
-        extension = platform_data.get('extension', "")
-        path = directory / f'{self.tool_name}{extension}'
+        path = directory / platform_data.executable
         return path
 
     def calculate_dir(self) -> Path:
         """
         Calculates the directory path of the tool based on the operating system.
         """
-        platform_data = self.get_platform_data()
-        subdir = platform_data.get('subdir', "")
+        subdir = self.get_platform_data().subdir
         if subdir:
             directory = self.tool_directory / subdir
         else:

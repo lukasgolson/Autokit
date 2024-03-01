@@ -21,9 +21,7 @@ def download(tool_directory: Path, url: str, chunk_size=1024, progress_callback=
 
     filename = url.split('/')[-1]
 
-    if progress_callback is None:
-        # create an empty object to hold progress_callback attributes
-        progress_callback = type('', (), {})()
+    progress_context = type('', (), {})()
 
     with tempfile.NamedTemporaryFile(suffix=".zip", delete=False) as fp:
         temp_file_name = fp.name
@@ -31,10 +29,10 @@ def download(tool_directory: Path, url: str, chunk_size=1024, progress_callback=
             bytes_downloaded += len(chunk)
             fp.write(chunk)
             if progress_callback:
-                progress_callback(progress_callback, filename, bytes_downloaded, total_size_in_bytes)
+                progress_callback(progress_context, filename, bytes_downloaded, total_size_in_bytes)
 
     if progress_callback:
-        progress_callback(progress_callback, filename, total_size_in_bytes, total_size_in_bytes)
+        progress_callback(progress_context, filename, total_size_in_bytes, total_size_in_bytes)
 
     with zipfile.ZipFile(temp_file_name, 'r') as zip_ref:
         zip_ref.extractall(tool_directory)

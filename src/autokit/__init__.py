@@ -4,5 +4,4 @@
 __version__ = '0.5.0'
 __name__ = "autokit"
 
-
-import externalTool
+from .ExternalTool import ExternalTool
