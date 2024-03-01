@@ -1,12 +1,12 @@
 from pathlib import Path
 
-import autokit.ExternalTool as ExternalTool
-from autokit.Config import ToolConfig, PlatformData
+
+from autokit import ToolConfig, PlatformData, ExternalTool
 
 
 class TestTool(ExternalTool):
     def __init__(self, base_dir: str = "./third-party", progress_bar: bool = True, lazy_setup: bool = False):
-        super().__init__(base_dir, progress_bar, lazy_setup)
+        super().__init__(Path(base_dir), progress_bar, lazy_setup)
 
     @property
     def config(self) -> ToolConfig:

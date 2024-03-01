@@ -1,4 +1,4 @@
-# autokit version 0.5.0
+# autokit version 0.6.0
 
 
 
@@ -13,40 +13,31 @@ pip install autokit
 ## Basic Usage
 
 ```python
-import autokit
-
-class MyTool(autokit.ExternalTool):
-    @property
-    def tool_name(self):
-        return "MyTool"
+class TestTool(ExternalTool):
+    def __init__(self, base_dir: str = "./third-party", progress_bar: bool = True, lazy_setup: bool = False):
+        super().__init__(base_dir, progress_bar, lazy_setup)
 
     @property
-    def platform_data(self):
-        return {
-            'Windows': {
-                'url': "example.com/downloads/windows.zip",
-                'subdir': "",
-                'extension': ".exe"
+    def config(self) -> ToolConfig:
+        return ToolConfig(
+            tool_name="test-tool",
+            platform_data={
+                "windows": PlatformData(
+                    url="https://github.com/IRSS-UBC/MediaTools/releases/download/latest/win-x64.zip",
+                    subdir=Path(""),
+                    executable=Path("IRSSMediaTools.exe")
+                ),
             },
-            'Darwin': {
-                'url': "example.com/downloads/osx-x64.zip",
-                'subdir': "",
-                'extension': ""
-            },
-            'Linux': {
-                'url': "example.com/downloads/linux.zip",
-                'subdir': "",
-                'extension': ""
-            },
-        }
+            python=False,
+        )
 
-    @property
-    def python(self):
-        return False
+    def help(self):
+        self.run_command("help")
 
 
-tool = MyTool(base_dir="./third-party")
-tool.run_command("--help")
+if __name__ == "__main__":
+    test = TestTool()
+    test.help()
 ```
 
 ## Features
