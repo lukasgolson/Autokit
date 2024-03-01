@@ -11,15 +11,15 @@ from pathlib import Path
 from typing import Dict
 
 from downloader import download
+from progressBar import print_progress_bar
 
 
 class ExternalTool(ABC):
-    def __init__(self, base_dir: Path = "./third-party", lazy_setup: bool = False):
+    def __init__(self, base_dir: Path = "./third-party", progress_bar: bool = False, lazy_setup: bool = False):
         self.base_dir = Path(base_dir)
 
         if not lazy_setup:
-            self.setup()
-
+            self.setup(progress_bar)
 
     @property
     @abstractmethod
@@ -51,7 +51,7 @@ class ExternalTool(ABC):
     def python(self) -> bool:
         return False
 
-    def setup(self) -> bool:
+    def setup(self, use_progress_bar=False) -> bool:
         """
         Sets up the tool by downloading and extracting it.
         """
@@ -60,10 +60,13 @@ class ExternalTool(ABC):
 
         self.tool_directory.mkdir(parents=True, exist_ok=True)
         url = self.get_platform_data()['url']
-        download(url)
+
+        if use_progress_bar:
+            download(self.tool_directory, url, progress_callback=print_progress_bar)
+        else:
+            download(self.tool_directory, url)
 
         if self.python:
-
             requirements = (self.calculate_dir() / "requirements.txt")
 
             if requirements.exists():
