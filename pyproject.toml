@@ -23,9 +23,9 @@ dependencies = [
     "loguru",
 ]
 
-optional-dependencies = [
-    "tqdm"
-]
+
+[project.optional-dependencies]
+tqdm = ["tqdm"]
 
 
 [project.urls]
