@@ -2,7 +2,6 @@
 
 
 __version__ = '0.9.0'
-__name__ = "autokit"
 
 from .ToolConfig import ToolConfig
 from .PlatformData import PlatformData

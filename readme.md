@@ -1,4 +1,4 @@
-# autokit version 0.8.0
+# autokit version 0.9.0
 
 
 
@@ -23,7 +23,7 @@ class TestTool(ExternalTool):
     @property
     def config(self) -> ToolConfig:
         return ToolConfig(
-            tool_name="test-tool",
+            tool_name="tests-tool",
             platform_data={
                 "windows": PlatformData(
                     url="https://github.com/IRSS-UBC/MediaTools/releases/download/latest/win-x64.zip",
