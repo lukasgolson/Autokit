@@ -74,7 +74,12 @@ class ExternalTool(ABC):
         return True
 
     def get_platform_data(self) -> PlatformData:
-        """Retrieves platform-specific data from the dictionary."""
+        """
+        Returns the platform data for the current operating system.
+
+        Raises:
+            ValueError: If the operating system is not supported.
+        """
         system = platform.system()
 
         platform_data = self.config.platform_data
