@@ -15,6 +15,11 @@ from .progressBar import print_progress_bar
 
 
 class ExternalTool(ABC):
+    """
+    The base class for all external tools. This class provides a framework for managing and executing downloadable tools.
+    Make sure to implement the config property in the subclass by defining the config property in the subclass.
+    """
+
     def __init__(self, base_dir: Path = "./third-party", progress_bar: bool = False, lazy_setup: bool = False):
         self.base_dir = Path(base_dir)
 
