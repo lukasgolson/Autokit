@@ -171,7 +171,7 @@ class ExternalTool(ABC):
             if " " in cmd:
                 commands[commands.index(cmd)] = f'"{cmd}"'
 
-        batch_file_lines = ["@echo off"]
+        batch_file_lines = []
 
         if working_directory:
             batch_file_lines.append(f'cd "{working_directory.resolve()}"')
@@ -185,7 +185,7 @@ class ExternalTool(ABC):
         result = subprocess.run([batch_file], shell=True, stdin=stdin, stdout=stdout)
 
         # clean up the batch file
-        batch_file.unlink()
+        #batch_file.unlink()
         return result.returncode
 
     def calculate_path(self) -> Path:
