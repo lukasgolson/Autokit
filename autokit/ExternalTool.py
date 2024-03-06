@@ -171,7 +171,7 @@ class ExternalTool(ABC):
             if " " in cmd:
                 commands[commands.index(cmd)] = f'"{cmd}"'
 
-        batch_file_lines = []
+        batch_file_lines = ["@echo off"]
 
         if working_directory:
             batch_file_lines.append(f'cd "{working_directory.resolve()}"')
@@ -179,7 +179,10 @@ class ExternalTool(ABC):
         batch_file_lines.append("start /i /wait" + " ".join(commands))
 
         with open(batch_file, "w") as file:
-            file.writelines(batch_file_lines)
+            # write the batch file. Each line is written with a newline character at the end.
+            # file.writelines(batch_file_lines) would not add the newline character.
+            for line in batch_file_lines:
+                file.write(line + "\n")
 
         # run the batch file in a new cmd window
         result = subprocess.run([batch_file], shell=True, stdin=stdin, stdout=stdout)
