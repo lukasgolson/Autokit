@@ -99,13 +99,15 @@ class ExternalTool(ABC):
             raise ValueError(f"Unsupported operating system: {system}")
         return platform_data[system]
 
-    def run_command(self, cmd: str, stdout=None, stderr=None, stdin=None) -> int:
+    def run_command(self, cmd: str, working_directory: Path = None, stdout=None, stderr=None, stdin=None) -> int:
         """
         Run a command in a subprocess.
 
         Args:
             cmd: The command to run as a string.
+            working_directory: The working directory for the subprocess.
             stdout: The file-like object to use as stdout.
+            stderr: The file-like object to use as stderr.
             stdin: The file-like object to use as stdin.
 
         Returns:
@@ -115,19 +117,10 @@ class ExternalTool(ABC):
         if not self.setup():
             raise ValueError(f"Could not set up {self.tool_name}")
 
-        if self.python:
-            cmd = f'{sys.executable} "{self.calculate_path().resolve()}" {cmd}'
-        else:
-            cmd = f'{self.calculate_path().resolve()} {cmd}'
-
-        command_args = shlex.split(cmd, posix=False)
-
-        for i, arg in enumerate(command_args):
-            if arg.startswith('"') and arg.endswith('"'):
-                command_args[i] = arg[1:-1]
+        command_args = self.generate_command(cmd)
 
         with subprocess.Popen(command_args, stdout=stdout, stderr=stderr, stdin=stdin, bufsize=1,
-                              universal_newlines=True) as p:
+                              universal_newlines=True, cwd=working_directory) as p:
 
             if p.stdout:
                 while True:
@@ -137,6 +130,52 @@ class ExternalTool(ABC):
 
             exit_code = p.wait()
         return exit_code
+
+    def generate_command(self, cmd):
+        if self.python:
+            cmd = f'{sys.executable} "{self.calculate_path().resolve()}" {cmd}'
+        else:
+            cmd = f'{self.calculate_path().resolve()} {cmd}'
+        command_args = shlex.split(cmd, posix=False)
+        for i, arg in enumerate(command_args):
+            if arg.startswith('"') and arg.endswith('"'):
+                command_args[i] = arg[1:-1]
+        return command_args
+
+    def run_command_console(self, command: str, working_directory: Path = None) -> int:
+        return self.run_command(command, working_directory=working_directory, stdin=sys.stdin, stdout=sys.stdout,
+                                stderr=sys.stderr)
+
+    def run_command_cmd(self, command: str, stdin=None, stdout=None) -> int:
+        """
+        Runs a command by creating a batch file and running it in a new CMD process.
+        This is a workaround for running commands that require a CMD environment.
+        Note 1) that this method is currently only supported on Windows.
+        Note 2) that this method opens up the same can of worms as running popen with shell=True.
+
+        Args:
+            command: The command to run as a string.
+            stdin: The file-like object to use as stdin.
+            stdout: The file-like object to use as stdout.
+        """
+        # create a new batch file
+
+        # get a temporary file name
+        temp_filename = Path(self.tool_name + ".bat")
+
+        batch_file = self.tool_directory / temp_filename
+
+        commands = self.generate_command(command)
+
+        with open(batch_file, "w") as file:
+            file.write(" ".join(commands))
+
+        # run the batch file in a new cmd window
+        result = subprocess.run([batch_file], shell=True, stdin=stdin, stdout=stdout)
+
+        # clean up the batch file
+        batch_file.unlink()
+        return result.returncode
 
     def calculate_path(self) -> Path:
         """
