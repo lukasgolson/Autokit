@@ -1,7 +1,7 @@
 # __init__.py
 
 
-__version__ = '0.12.1'
+__version__ = '0.13.0'
 
 from .ToolConfig import ToolConfig
 from .PlatformData import PlatformData
