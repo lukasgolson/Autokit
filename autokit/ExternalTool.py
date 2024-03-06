@@ -133,10 +133,10 @@ class ExternalTool(ABC):
 
     def generate_command(self, cmd):
         if self.python:
-            cmd = f'{sys.executable} "{self.calculate_path().resolve()}" {cmd}'
+            full_command = f'"{sys.executable}" "{self.calculate_path().resolve()}" {cmd}'
         else:
-            cmd = f'{self.calculate_path().resolve()} {cmd}'
-        command_args = shlex.split(cmd, posix=False)
+            full_command = f'"{self.calculate_path().resolve()}" {cmd}'
+        command_args = shlex.split(full_command, posix=False)
         for i, arg in enumerate(command_args):
             if arg.startswith('"') and arg.endswith('"'):
                 command_args[i] = arg[1:-1]
@@ -146,7 +146,7 @@ class ExternalTool(ABC):
         return self.run_command(command, working_directory=working_directory, stdin=sys.stdin, stdout=sys.stdout,
                                 stderr=sys.stderr)
 
-    def run_command_cmd(self, command: str, stdin=None, stdout=None) -> int:
+    def run_command_cmd(self, command: str, stdin=None, stdout=None, working_directory: Path = None) -> int:
         """
         Runs a command by creating a batch file and running it in a new CMD process.
         This is a workaround for running commands that require a CMD environment.
@@ -167,8 +167,19 @@ class ExternalTool(ABC):
 
         commands = self.generate_command(command)
 
+        for cmd in commands:
+            if " " in cmd:
+                commands[commands.index(cmd)] = f'"{cmd}"'
+
+        batch_file_lines = ["@echo off"]
+
+        if working_directory:
+            batch_file_lines.append(f'cd "{working_directory.resolve()}"')
+
+        batch_file_lines.append("start /i /wait" + " ".join(commands))
+
         with open(batch_file, "w") as file:
-            file.write(" ".join(commands))
+            file.writelines(batch_file_lines)
 
         # run the batch file in a new cmd window
         result = subprocess.run([batch_file], shell=True, stdin=stdin, stdout=stdout)
