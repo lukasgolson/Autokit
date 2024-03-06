@@ -144,7 +144,7 @@ class ExternalTool(ABC):
         """
         directory = self.calculate_dir()
         platform_data = self.get_platform_data()
-        path = directory / platform_data.executable
+        path = Path(directory) / Path(platform_data.executable)
         return path
 
     def calculate_dir(self) -> Path:
