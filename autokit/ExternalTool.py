@@ -176,7 +176,7 @@ class ExternalTool(ABC):
         if working_directory:
             batch_file_lines.append(f'cd "{working_directory.resolve()}"')
 
-        batch_file_lines.append("start /i /wait " + " ".join(commands))
+        batch_file_lines.append(f'start "{self.tool_name}" /i /wait ' + " ".join(commands))
 
         with open(batch_file, "w") as file:
             # write the batch file. Each line is written with a newline character at the end.
