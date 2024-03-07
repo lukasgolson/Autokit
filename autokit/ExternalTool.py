@@ -167,6 +167,10 @@ class ExternalTool(ABC):
 
         commands = self.generate_command(command)
 
+        # if the file does not exist, create it
+        if not batch_file.exists():
+            batch_file.touch()
+
         for cmd in commands:
             if " " in cmd:
                 commands[commands.index(cmd)] = f'"{cmd}"'
@@ -177,6 +181,8 @@ class ExternalTool(ABC):
             batch_file_lines.append(f'cd "{working_directory.resolve()}"')
 
         batch_file_lines.append(f'start "{self.tool_name}" /i /wait ' + " ".join(commands))
+
+
 
         with open(batch_file, "w") as file:
             # write the batch file. Each line is written with a newline character at the end.
