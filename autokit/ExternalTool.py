@@ -48,7 +48,7 @@ class ExternalTool(ABC):
         """
         Returns the directory where the tool is installed.
         """
-        return Path(self.base_dir) / Path(self.tool_name)
+        return Path(self.base_dir) / self.tool_name
 
     def setup(self, use_progress_bar=False) -> bool:
         """
@@ -161,13 +161,13 @@ class ExternalTool(ABC):
         # create a new batch file
 
         # get a temporary file name
-        temp_filename = Path(self.tool_name + ".bat")
+        temp_filename = self.tool_name + ".bat"
 
-        batch_file = temp_filename.resolve()
+        batch_file_path = self.tool_directory / temp_filename
 
         # build folder path
-        if not batch_file.parent.exists():
-            batch_file.parent.mkdir(parents=True)
+        if not batch_file_path.parent.exists():
+            batch_file_path.parent.mkdir(parents=True)
 
         commands = self.generate_command(command)
 
@@ -182,14 +182,17 @@ class ExternalTool(ABC):
 
         batch_file_lines.append(f'start "{self.tool_name}" /i /wait ' + " ".join(commands))
 
-        with open(batch_file, "w+") as file:
+        batch_file_lines.append(f'cd "{Path.cwd()}"')
+        batch_file_lines.append("exit")
+
+        with open(batch_file_path, "w+") as file:
             # write the batch file. Each line is written with a newline character at the end.
             # file.writelines(batch_file_lines) would not add the newline character.
             for line in batch_file_lines:
                 file.write(line + "\n")
 
         # run the batch file in a new cmd window
-        result = subprocess.run([batch_file], shell=True, stdin=stdin, stdout=stdout)
+        result = subprocess.run([batch_file_path], shell=True, stdin=stdin, stdout=stdout)
 
         # clean up the batch file
         # batch_file.unlink()
