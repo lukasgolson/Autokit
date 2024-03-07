@@ -163,13 +163,9 @@ class ExternalTool(ABC):
         # get a temporary file name
         temp_filename = Path(self.tool_name + ".bat")
 
-        batch_file = self.tool_directory / temp_filename
+        batch_file = (self.tool_directory / temp_filename).resolve()
 
         commands = self.generate_command(command)
-
-        # if the file does not exist, create it
-        if not batch_file.exists():
-            batch_file.touch()
 
         for cmd in commands:
             if " " in cmd:
@@ -182,9 +178,7 @@ class ExternalTool(ABC):
 
         batch_file_lines.append(f'start "{self.tool_name}" /i /wait ' + " ".join(commands))
 
-
-
-        with open(batch_file, "w") as file:
+        with open(batch_file, "w+") as file:
             # write the batch file. Each line is written with a newline character at the end.
             # file.writelines(batch_file_lines) would not add the newline character.
             for line in batch_file_lines:
@@ -194,7 +188,7 @@ class ExternalTool(ABC):
         result = subprocess.run([batch_file], shell=True, stdin=stdin, stdout=stdout)
 
         # clean up the batch file
-        #batch_file.unlink()
+        # batch_file.unlink()
         return result.returncode
 
     def calculate_path(self) -> Path:
