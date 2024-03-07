@@ -163,7 +163,11 @@ class ExternalTool(ABC):
         # get a temporary file name
         temp_filename = Path(self.tool_name + ".bat")
 
-        batch_file = (self.tool_directory / temp_filename).resolve()
+        batch_file = temp_filename.resolve()
+
+        # build folder path
+        if not batch_file.parent.exists():
+            batch_file.parent.mkdir(parents=True)
 
         commands = self.generate_command(command)
 
