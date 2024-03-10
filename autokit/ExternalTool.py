@@ -4,12 +4,14 @@ A framework for managing and executing downloadable tools.
 
 import platform
 import shlex
+import shutil
 import subprocess
 import sys
 from abc import ABC, abstractmethod
 from pathlib import Path
 
 from . import ToolConfig, PlatformData
+from .ExecutableType import ExecutableType
 from .downloader import download
 from .progressBar import print_progress_bar
 
@@ -41,7 +43,7 @@ class ExternalTool(ABC):
 
     @property
     def python(self) -> bool:
-        return self.config.python
+        return self.config.executable_type == ExecutableType.PYTHON
 
     @property
     def tool_directory(self) -> Path:
@@ -132,10 +134,16 @@ class ExternalTool(ABC):
         return exit_code
 
     def generate_command(self, cmd):
-        if self.python:
-            full_command = f'"{sys.executable}" "{self.calculate_path().resolve()}" {cmd}'
-        else:
+        if self.config.executable_type == ExecutableType.EXECUTABLE:
             full_command = f'"{self.calculate_path().resolve()}" {cmd}'
+        elif self.config.executable_type == ExecutableType.PYTHON:
+            full_command = f'"{sys.executable}" "{self.calculate_path().resolve()}" {cmd}'
+        elif self.config.executable_type == ExecutableType.RScript:
+            if shutil.which("Rscript") is None:
+                raise ValueError("R is not installed or has not been added to path environment variable.")
+            full_command = f'Rscript "{self.calculate_path().resolve()}" {cmd}'
+        else:
+            raise ValueError(f"Unsupported executable type: {self.config.executable_type}")
         command_args = shlex.split(full_command, posix=False)
         for i, arg in enumerate(command_args):
             if arg.startswith('"') and arg.endswith('"'):

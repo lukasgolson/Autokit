@@ -1,6 +1,7 @@
 from typing import Dict, NamedTuple
 
 from autokit import PlatformData
+from autokit.ExecutableType import ExecutableType
 
 
 class ToolConfig(NamedTuple):
@@ -11,12 +12,10 @@ class ToolConfig(NamedTuple):
     ----------
     tool_name : str
         The name of the tool.
-    python : bool
-        Whether the tool should be executed by the Python interpreter or treated as an executable.
     platform_data : Dict[str, PlatformData]
         The platform data for the tool.
+    executable_type : ExecutableType
     """
     tool_name: str
-    python: bool
     platform_data: Dict[str, PlatformData]
-
+    executable_type: ExecutableType = ExecutableType.EXECUTABLE
