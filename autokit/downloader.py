@@ -1,4 +1,5 @@
 import os
+import shutil
 
 import requests
 import zipfile
@@ -45,7 +46,9 @@ def download(tool_directory: Path, url: str, chunk_size=1024, progress_callback=
     if file_type or file_suffix == '.zip':
         with zipfile.ZipFile(temp_file_name, 'r') as zip_ref:
             zip_ref.extractall(tool_directory)
-        os.remove(temp_file_name)
     else:
-        os.rename(temp_file_name, tool_directory / filename)
+        shutil.copyfile(temp_file_name, tool_directory / filename)
+
+    os.remove(temp_file_name)
+
 
