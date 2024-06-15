@@ -10,14 +10,15 @@ class PlatformData(NamedTuple):
     ----------
     url : str
         The URL to download the tool from.
-    subdir : Path
-        The subdirectory to extract the tool to.
     executable : Path
         The path to the executable, relative to the subdir.
+    subdir : Path
+        The subdirectory to extract the tool to. If None, the tool will be extracted to the tool directory.
     """
     url: str
-    subdir: Path
     executable: Path
+    subdir: Path | None = None
+
 
 
 
