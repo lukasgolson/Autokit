@@ -7,7 +7,7 @@ from pathlib import Path
 
 
 def download(tool_directory: Path, url: str, chunk_size=1024, progress_callback=None,
-             file_type: str | None = ".zip") -> None:
+             file_type: str | None = None) -> None:
     """
     Downloads a file from the given URL and extracts it if it is a zip archive.
 
