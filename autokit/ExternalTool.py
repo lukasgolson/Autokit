@@ -101,7 +101,7 @@ class ExternalTool(ABC):
             raise ValueError(f"Unsupported operating system: {system}")
         return platform_data[system]
 
-    def run_command(self, cmd: str, working_directory: Path = None, stdout=None, stderr=None, stdin=None, encoding=None) -> int:
+    def run_command(self, cmd: str, working_directory: Path = None, stdout=None, stderr=None, stdin=None, encoding='utf-8') -> int:
         """
         Run a command in a subprocess.
 
@@ -111,7 +111,6 @@ class ExternalTool(ABC):
             stdout: The file-like object to use as stdout.
             stderr: The file-like object to use as stderr.
             stdin: The file-like object to use as stdin.
-            encoding: The encoding to use for the subprocess output.
 
         Returns:
             The exit code of the subprocess.
@@ -122,18 +121,25 @@ class ExternalTool(ABC):
 
         command_args = self.generate_command(cmd)
 
-        with subprocess.Popen(command_args, stdout=stdout, stderr=stderr, stdin=stdin, bufsize=1,
-                              universal_newlines=True, cwd=working_directory, encoding=encoding) as p:
+        with subprocess.Popen(command_args, stdout=subprocess.PIPE if stdout is None else stdout,
+                              stderr=subprocess.PIPE if stderr is None else stderr, stdin=stdin, bufsize=1,
+                              universal_newlines=False,
+                              cwd=working_directory) as p:  # universal_newlines=False means we are dealing with bytes
 
-            if p.stdout:
-                while True:
-                    line = p.stdout.readline()
-                    if not line:
-                        break
+            # Handle custom stdout
+            if stdout is None and p.stdout:
+                for line in p.stdout:
+                    decoded_line = line.decode(encoding, errors='replace')
+                    print(decoded_line, end='')
+
+            # Handle custom stderr
+            if stderr is None and p.stderr:
+                for line in p.stderr:
+                    decoded_line = line.decode(encoding, errors='replace')
+                    print(decoded_line, end='')
 
             exit_code = p.wait()
         return exit_code
-
     def generate_command(self, cmd):
         if self.config.executable_type == ExecutableType.EXECUTABLE:
             full_command = f'"{self.calculate_path().resolve()}" {cmd}'
