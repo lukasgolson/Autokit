@@ -101,7 +101,7 @@ class ExternalTool(ABC):
             raise ValueError(f"Unsupported operating system: {system}")
         return platform_data[system]
 
-    def run_command(self, cmd: str, working_directory: Path = None, stdout=None, stderr=None, stdin=None) -> int:
+    def run_command(self, cmd: str, working_directory: Path = None, stdout=None, stderr=None, stdin=None, encoding=None) -> int:
         """
         Run a command in a subprocess.
 
@@ -111,6 +111,7 @@ class ExternalTool(ABC):
             stdout: The file-like object to use as stdout.
             stderr: The file-like object to use as stderr.
             stdin: The file-like object to use as stdin.
+            encoding: The encoding to use for the subprocess output.
 
         Returns:
             The exit code of the subprocess.
@@ -122,7 +123,7 @@ class ExternalTool(ABC):
         command_args = self.generate_command(cmd)
 
         with subprocess.Popen(command_args, stdout=stdout, stderr=stderr, stdin=stdin, bufsize=1,
-                              universal_newlines=True, cwd=working_directory) as p:
+                              universal_newlines=True, cwd=working_directory, encoding=encoding) as p:
 
             if p.stdout:
                 while True:
